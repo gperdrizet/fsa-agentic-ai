@@ -1,5 +1,6 @@
 langgraph==1.2.15
-networkx==3.7
+matplotlib
+networkx
 openai==3.29.0
 pydantic==2.14.1
 python-dotenv==1.2.4
