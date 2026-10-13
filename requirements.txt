@@ -8,3 +8,7 @@ pydantic==2.10.6
 networkx==3.2.1
 matplotlib==3.8.2
 python-dotenv==1.0.1
+streamlit
+python-dotenv
+pydantic
+openai

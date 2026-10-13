@@ -4,16 +4,13 @@ from dotenv import load_dotenv
 import os
 import streamlit as st
 from pydantic import BaseModel
-import openai
+from openai import OpenAI
 
 # Step 1: Load environment variables
-# Load the OpenAI API key from a .env file to authenticate with the OpenAI API.
+load_dotenv()
 
-client = openai.AzureOpenAI(
-    api_key="",  
-    api_version="2023-12-01-preview",
-    azure_endpoint = "https://openai-api-management-gw.azure-api.net/openaiprodtest/deployments/gpt-4o-mini/chat/completions?api-version=2023-12-01-preview"
-)
+# Load the OpenAI API key from a .env file to authenticate with the OpenAI API.
+client = OpenAI()
 
 # Step 2: Define a structured schema using Pydantic
 # This schema will ensure that the LLM output is structured and validated.
@@ -28,8 +25,6 @@ st.write("Enter a question to receive an optimized web search query and reasonin
 
 # Step 4: Create input field for the user's question
 user_query = st.text_input("Enter your question:") # ask question
-
-
 
 # Step 5: Process the input query and display the result
 if user_query:
