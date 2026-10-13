@@ -1,0 +1,24 @@
+{
+  "name": "Python 3.12",
+  "image": "python:3.12-slim",
+  "forwardPorts": [
+    8501
+  ],
+  "portsAttributes": {
+    "8501": {
+      "label": "Streamlit"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  },
+  "postCreateCommand": "python -m venv .venv && ./.venv/bin/pip install -r requirements.txt && ([ -f .env ] || cp .env.template .env)"
+}
