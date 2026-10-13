@@ -1,0 +1,10 @@
+langchain==0.3.19
+langgraph==0.3.0
+openai==1.64.0
+streamlit==1.30.0
+matplotlib==3.8.2
+langchain-openai>=0.1.0
+pydantic==2.10.6
+networkx==3.2.1
+matplotlib==3.8.2
+python-dotenv==1.0.1
