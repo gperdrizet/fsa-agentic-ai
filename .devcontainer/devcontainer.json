@@ -12,6 +12,9 @@
   },
   "customizations": {
     "vscode": {
+      "settings": {
+        "python.terminal.useEnvFile": true
+      },
       "extensions": [
         "ms-python.python",
         "streetsidesoftware.code-spell-checker"
