@@ -17,20 +17,20 @@ First, fork this repository to your own GitHub account.
 
 ### 1. Pick your environment
 
-   >#### Option 1: GitHub Codespaces
-   >
+   #### Option 1: GitHub Codespaces
+   
    >Open your fork on GitHub, click **Code**, select the **Codespaces** tab, and click **Create codespace on main**.
 
-   >#### Option 2: Local clone (terminal only)
-   >
+   #### Option 2: Local clone (terminal only)
+   
    >Clone your fork and enter the directory:
    >```bash
    >git clone https://github.com/<your-username>/fsa-agentic-ai.git
    >cd fsa-agentic-ai
    >```
 
-   >#### Option 3: Local clone (VS code)
-   >
+   #### Option 3: Local clone (VS code)
+   
    >Clone your fork and enter the directory:
    >```bash
    >git clone https://github.com/<your-username>/fsa-agentic-ai.git
@@ -42,8 +42,8 @@ First, fork this repository to your own GitHub account.
    >code .
    >```
 
-   >#### Option 4: Local clone (VS code + devcontainer)
-   >
+   #### Option 4: Local clone (VS code + devcontainer)
+   
    >Clone your fork and enter the directory:
    >```bash
    >git clone https://github.com/<your-username>/fsa-agentic-ai.git
