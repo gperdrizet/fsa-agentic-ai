@@ -13,7 +13,8 @@
   "customizations": {
     "vscode": {
       "settings": {
-        "python.terminal.useEnvFile": true
+        "python.terminal.useEnvFile": true,
+        "python.terminal.activateEnvironment": false
       },
       "extensions": [
         "ms-python.python",
