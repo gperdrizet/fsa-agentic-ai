@@ -53,7 +53,7 @@ def visualize_graph():
     nx.draw(graph, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=10, font_weight='bold')
 
     current_file_path = Path(__file__).resolve()
-    workflow_image_path = current_file_path.parent / "D2_graph.png"
+    workflow_image_path = current_file_path.parent / "D5_graph.png"
 
     plt.savefig(workflow_image_path)
     
