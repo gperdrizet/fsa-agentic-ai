@@ -3,6 +3,9 @@ langgraph==1.2.15
 matplotlib
 networkx
 openai==3.29.0
+pdf2image
+python-poppler
 pydantic==2.14.1
+pytesseract
 python-dotenv==1.2.4
 streamlit
