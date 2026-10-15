@@ -1,11 +1,13 @@
 autogen==0.14.1
+easyocr
 langgraph==1.2.15
 matplotlib
 networkx
 openai==3.29.0
-pdf2image
-python-poppler
+pillow
 pydantic==2.14.1
-pytesseract
+pymupdf
 python-dotenv==1.2.4
 streamlit
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
