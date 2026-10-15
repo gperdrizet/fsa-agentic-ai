@@ -1,27 +1,64 @@
 import streamlit as st
-import pytesseract
-from pdf2image import convert_from_path
-from autogen import ConversableAgent, UserProxyAgent
-import tempfile
-import os
 
-# Ensure Tesseract is correctly set up (update path if necessary)
-pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract' 
+import io
+import pymupdf  # PyMuPDF
+import numpy as np
+from PIL import Image
+import easyocr
+from autogen import ConversableAgent, UserProxyAgent
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+llm_config = {
+    "config_list": [{
+        "model": "gpt-4o-mini",
+        "api_key": os.environ["OPENAI_API_KEY"],
+        "base_url": os.environ["OPENAI_BASE_URL"]
+    }]
+}
 
 # Step 1: Function to extract text from a PDF using OCR
 def extract_text_from_pdf(uploaded_file):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-        temp_file.write(uploaded_file.read())  # Save uploaded PDF to a temp file
-        temp_file_path = temp_file.name  # Get temp file path
+    # 1. Initialize the EasyOCR reader (English language)
+    # Set gpu=True if your system has a dedicated NVIDIA GPU
+    reader = easyocr.Reader(['en'], gpu=False)
 
-    try:
-        images = convert_from_path(temp_file_path)  # Convert PDF to images
-        text = "\n".join(pytesseract.image_to_string(img, config="--psm 6") for img in images)  # Perform OCR
-    except Exception as e:
-        st.error(f"Error processing PDF: {e}")
-        text = ""
+    # Empty string to gather pages
+    text = ''
 
-    os.remove(temp_file_path)  # Cleanup temp file
+    # Create byte stream from file
+    pdf_bytes = uploaded_file.read() 
+    
+    # Open the byte stream with PyMuPDF
+    with pymupdf.open(stream=pdf_bytes, filetype="pdf") as doc:
+        
+        # Loop through each page
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            
+            # --- Optimization Step ---
+            # Try to grab digital text first to bypass heavy OCR if possible
+            existing_text = page.get_text()
+            if existing_text.strip():
+                text += existing_text + "\n"
+                continue
+            
+            # --- Scanned Page Fallback ---
+            # Get pixel data (zoom=2 scales up for optimal 300 DPI legibility)
+            mat = pymupdf.Matrix(2, 2)
+            pix = page.get_pixmap(matrix=mat)
+            
+            # Convert raw PyMuPDF pixels straight into a NumPy array
+            image_data = pix.tobytes("png")
+            image = Image.open(io.BytesIO(image_data))
+            image_np = np.array(image)
+            
+            # Run EasyOCR (detail=0 returns raw text blocks joined by spaces)
+            ocr_results = reader.readtext(image_np, detail=0)
+            text += "\n".join(ocr_results) + "\n"
+            
     return text
 
 # Step 2: Define AutoGen Agents
@@ -29,22 +66,26 @@ user_agent = UserProxyAgent(name="User", code_execution_config={"use_docker": Fa
 
 doc_ingestor = ConversableAgent(
     name="Document_Ingestor",
-    system_message="Extract key clauses from a contract document."
+    system_message="Extract key clauses from a contract document.",
+    llm_config=llm_config
 )
 
 compliance_checker = ConversableAgent(
     name="Compliance_Checker",
-    system_message="Review the contract for compliance with GDPR, corporate policies, and industry standards."
+    system_message="Review the contract for compliance with GDPR, corporate policies, and industry standards.",
+    llm_config=llm_config
 )
 
 risk_assessor = ConversableAgent(
     name="Risk_Assessor",
-    system_message="Analyze the contract and highlight potential risks, missing clauses, and ambiguities."
+    system_message="Analyze the contract and highlight potential risks, missing clauses, and ambiguities.",
+    llm_config=llm_config
 )
 
 revision_recommender = ConversableAgent(
     name="Revision_Recommender",
-    system_message="Suggest contract modifications to improve clarity, reduce risks, and ensure compliance."
+    system_message="Suggest contract modifications to improve clarity, reduce risks, and ensure compliance.",
+    llm_config=llm_config
 )
 
 # Step 3: Create Streamlit UI
