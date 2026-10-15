@@ -102,8 +102,10 @@ def build_workflow():
 # Step 6: Streamlit UI to trigger workflow
 def run_streamlit_app():
     """Handles Streamlit UI interactions and workflow execution."""
+
     st.title("Creative Advertisement Generator")
     topic = st.text_input("Enter the topic:")
+
     if st.button("Generate Advertisement"):
         parallel_workflow = build_workflow()
         state = parallel_workflow.invoke({"topic": topic})
