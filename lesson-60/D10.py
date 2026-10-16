@@ -13,7 +13,7 @@ load_dotenv()
 
 llm_config = {
     "config_list": [{
-        "model": "gpt-4o-mini",
+        "model": os.environ["OPENAI_MODEL_STRING"],
         "api_key": os.environ["OPENAI_API_KEY"],
         "base_url": os.environ["OPENAI_BASE_URL"]
     }]
@@ -22,7 +22,6 @@ llm_config = {
 # Step 1: Function to extract text from a PDF using OCR
 def extract_text_from_pdf(uploaded_file):
     # 1. Initialize the EasyOCR reader (English language)
-    # Set gpu=True if your system has a dedicated NVIDIA GPU
     reader = easyocr.Reader(['en'], gpu=False)
 
     # Empty string to gather pages
@@ -41,6 +40,7 @@ def extract_text_from_pdf(uploaded_file):
             # --- Optimization Step ---
             # Try to grab digital text first to bypass heavy OCR if possible
             existing_text = page.get_text()
+
             if existing_text.strip():
                 text += existing_text + "\n"
                 continue
@@ -62,7 +62,7 @@ def extract_text_from_pdf(uploaded_file):
     return text
 
 # Step 2: Define AutoGen Agents
-user_agent = UserProxyAgent(name="User", code_execution_config={"use_docker": False})
+user_agent = UserProxyAgent(name="User", human_input_mode="NEVER", code_execution_config=False)
 
 doc_ingestor = ConversableAgent(
     name="Document_Ingestor",
@@ -107,20 +107,24 @@ if uploaded_file:
         with st.spinner("Processing..."):
             extracted_clauses = user_agent.initiate_chat(
                 recipient=doc_ingestor,
+                max_turns=1,
                 message=f"Extract key clauses from the following contract:\n{contract_text}"
-            )
+            ).summary
             compliance_issues = user_agent.initiate_chat(
                 recipient=compliance_checker,
-                message=f"Review this contract for compliance with GDPR and corporate legal policies:\n{contract_text}"
-            )
+                max_turns=1,
+                message=f"Review this contract for compliance with GDPR and corporate legal policies:\n{contract_text}\n\nExtracted clauses:\n{extracted_clauses}"
+            ).summary
             risk_analysis = user_agent.initiate_chat(
                 recipient=risk_assessor,
-                message=f"Analyze the contract and highlight risks or missing clauses:\n{contract_text}"
-            )
+                max_turns=1,
+                message=f"Analyze the contract and highlight risks or missing clauses:\n{contract_text}\n\nExtracted clauses:\n{extracted_clauses}\n\nCompliance findings:\n{compliance_issues}"
+            ).summary
             revisions = user_agent.initiate_chat(
                 recipient=revision_recommender,
-                message=f"Suggest modifications to improve contract clarity and compliance:\n{contract_text}"
-            )
+                max_turns=1,
+                message=f"Suggest modifications to improve contract clarity and compliance based on these findings:\n{contract_text}\n\nExtracted clauses:\n{extracted_clauses}\n\nCompliance findings:\n{compliance_issues}\n\nRisk analysis:\n{risk_analysis}"
+            ).summary
 
         # 3.3 : Display Analysis Results
         st.subheader("Contract Analysis Results")
