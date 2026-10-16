@@ -9,6 +9,8 @@ from openai import OpenAI
 # Step 1: Load environment variables
 load_dotenv()
 
+model = os.getenv("OPENAI_MODEL_STRING", "gpt-4o-mini")
+
 # Load the OpenAI API key from a .env file to authenticate with the OpenAI API.
 client = OpenAI()
 
@@ -30,7 +32,7 @@ user_query = st.text_input("Enter your question:") # ask question
 if user_query:
     # Invoke the LLM with the user query
     # Extract relevant parts of the response
-    response = client.chat.completions.create(model="gpt-4o-mini",
+    response = client.chat.completions.create(model=model,
                                           messages=[{"role": "user", "content": user_query}],
                                           temperature=0.3)
     response_content = response.choices[0].message.content
